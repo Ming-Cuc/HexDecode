@@ -1,13 +1,23 @@
 import { useState } from 'react';
 
+// Định nghĩa kiểu cho kết quả decode
+type DecodeResult = {
+  ok: boolean;
+  encoding: string;
+  bytes: number;
+  text: string;
+  hexNormalized: string;
+  error?: string;
+};
+
 export default function App() {
   const [hex, setHex] = useState('48656c6c6f20576f726c6421'); // Hello World!
   const [enc, setEnc] = useState('utf8');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<DecodeResult | null>(null);
   const [error, setError] = useState('');
 
-  async function handleDecode(e) {
+  async function handleDecode(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -17,7 +27,7 @@ export default function App() {
       // Nếu đã config proxy, gọi thẳng /api...
       const url = `/api/decode?hex=${encodeURIComponent(hex)}&enc=${encodeURIComponent(enc)}`;
       const res = await fetch(url);
-      const data = await res.json();
+      const data: DecodeResult = await res.json();
       if (!res.ok || !data.ok) {
         setError(data.error || 'Decode thất bại');
       } else {
